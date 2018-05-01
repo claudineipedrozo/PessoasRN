@@ -1,53 +1,41 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StackNavigator } from 'react-navigation';
 
-import Header from './src/components/Header';
-import axios from 'axios';
+import PeoplePage from './src/pages/PeoplePage';
+import PeopleDetailPage from './src/pages/PeopleDetailPage';
 
-export default class App extends React.Component {
+import { capitalizeFirstLetter } from './src/util';
 
-  constructor(props) {
-      super(props);
-
-      this.state = {
-        peoples: []
-      };
-  }
-
-  componentDidMount() {
-    axios
-    .get('https://randomuser.me/api/?nat=br&results=5')
-    .then(response => { 
-        const { results } = response.data;
-        this.setState({
-            peoples: results
-        });
-    });
-  }
-
-  renderList() {
-      const textElements = this.state.peoples.map(people => {
-         const { first } = people.name;
-         return <Text key={ first }>{ first }</Text>
-      })
-      return textElements;
-  }
-
-  render() {
-    return (
-      <View>
-        <Header title="Pessoas"/>
-        {this.renderList()}        
-      </View>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-});
+export default StackNavigator({
+    'Main': {
+      screen: PeoplePage
+    },
+    'PeopleDetail': {
+      screen: PeopleDetailPage,
+      navigationOptions: ({ navigation }) => {
+        const peopleName = capitalizeFirstLetter(navigation.state.params.people.name.first);
+        
+        return({
+          title: peopleName,
+          headerTitleStyle: {
+            color: 'white',
+            fontSize: 30,
+          }
+        })
+      }
+    }
+  }, {
+    navigationOptions: {
+      title: 'Pessoas',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: '#6ca2f7',
+        borderBottomWidth: 1,
+        borderBottomColor: '#C5C5C5'
+      },
+      headerTitleStyle: {
+        color: 'white',
+        fontSize: 30,
+        alignSelf: 'center',
+      }
+    }
+  });
